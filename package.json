@@ -1,0 +1,19 @@
+{
+  "name": "axios-chain",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:Gobbao/axios-chain.git",
+  "author": "Gabriel Gobbi",
+  "license": "MIT",
+  "scripts": {
+    "dev": "tsnd --transpile-only ./src",
+    "build": "rm -rf dist/ && tsc"
+  },
+  "dependencies": {
+    "axios": "^0.20.0"
+  },
+  "devDependencies": {
+    "ts-node-dev": "^1.0.0-pre.63",
+    "typescript": "^4.0.3"
+  }
+}
