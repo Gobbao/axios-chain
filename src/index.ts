@@ -1,4 +1,4 @@
-import axios, { AxiosPromise, AxiosRequestConfig, Method, ResponseType } from 'axios'
+import axios, { AxiosInstance, AxiosPromise, AxiosRequestConfig, Method, ResponseType } from 'axios'
 
 interface PathParams {
   [key: string]: string | number
@@ -6,6 +6,7 @@ interface PathParams {
 
 interface RequestConfig extends AxiosRequestConfig {
   pathParams?: PathParams
+  instance?: AxiosInstance
 }
 
 interface AxiosConfigChain<T> {
@@ -17,6 +18,7 @@ interface AxiosConfigChain<T> {
   headers: (headers: any) => AxiosConfigChain<T>
   timeout: (timeout: number) => AxiosConfigChain<T>
   expect: (responseType: ResponseType) => AxiosConfigChain<T>
+  instance: (instance: AxiosInstance) => AxiosConfigChain<T>
   config: (axiosConfig: AxiosRequestConfig) => AxiosConfigChain<T>
   send: (data?: any) => AxiosPromise<T>
 }
@@ -41,12 +43,17 @@ const wrapper = <T>(config: RequestConfig): AxiosConfigChain<T> => ({
   headers: headers => wrapper({ ...config, headers }),
   timeout: timeout => wrapper({ ...config, timeout }),
   expect: responseType => wrapper({ ...config, responseType }),
+  instance: instance => wrapper({ ...config, instance }),
   config: axiosConfig => wrapper({ ...config, ...axiosConfig }),
-  send: data => axios({
-    ...config,
-    ...replacePathParams(config),
-    data: data || config.data,
-  }),
+  send: data => {
+    const { pathParams, instance, ...axiosConfig } = config
+
+    return (instance || axios)({
+      ...axiosConfig,
+      ...replacePathParams(config),
+      data: data || config.data,
+    })
+  },
 })
 
 const replacePathParams = (config: RequestConfig) => {
